@@ -1,0 +1,172 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ボードゲーム(Gemini)</title><style>
+*{box-sizing:border-box}
+:root{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;color:#20283a}
+body{margin:0;background:#fafafa}
+main{width:min(100%,820px);margin:0 auto;padding:24px 24px 42px}
+h1{text-align:center;font-size:clamp(25px,4vw,38px);font-weight:800;letter-spacing:.01em;margin:8px 0 34px;color:#20283a}
+.panel{background:#fff;border:2px solid #e5e5e5;border-radius:28px;padding:24px;margin:20px 0}
+.modebar{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+.pill{border:2px solid #d5d5d5;border-radius:999px;padding:17px 12px;font-size:20px;font-weight:700;background:#fff;color:#20283a}
+.pill.active{border-color:#6384f5;background:#edf1ff;color:#203a7b}
+.settings h2{font-size:25px;margin:2px 0 22px}
+.settingrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0}
+.settingrow label{font-size:21px;font-weight:500}
+.choice{display:flex;gap:10px}
+.choice button{min-width:132px;border:2px solid #d5d5d5;border-radius:999px;background:#fff;padding:15px 12px;font-size:19px;font-weight:700;color:#20283a}
+.choice button.active{border-color:#6384f5;background:#edf1ff;color:#203a7b}
+.primary{width:100%;border:0;border-radius:999px;background:#4c65d9;color:#fff;padding:18px;font-size:20px;font-weight:750;margin-top:10px}
+.hidden-native{display:none!important}
+.scoregrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.scorecard{text-align:center;padding:24px 12px;border:2px solid #e5e5e5;border-radius:28px;background:#fff}
+.scorecard h3{font-size:25px;margin:0 0 4px}
+.scorecard .count{font-size:32px;line-height:1.2;font-weight:800}
+.scorecard .sub{font-size:18px;color:#777;margin:2px 0}
+.scorecard .resource{font-size:23px;font-weight:700;margin-top:10px}
+.blue{color:#3157c8}.red{color:#b52e2e}
+.boardhead{display:flex;justify-content:space-between;align-items:center;margin:22px 8px 16px}
+.boardhead h2{font-size:25px;margin:0}
+.turnbadge{background:#f0f2f8;border-radius:999px;padding:14px 20px;font-size:19px}
+.status{background:#f2f2f3;border-radius:18px;text-align:center;padding:18px 12px;font-size:19px;color:#30394b;margin-bottom:22px;min-height:60px}
+.board-wrap{width:100%;max-width:770px;margin:0 auto 24px;background:#fff;border:4px solid #e1e1e1;border-radius:58px;padding:26px}
+.board{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;aspect-ratio:1}
+.cell{position:relative;border:0;border-radius:24%;padding:0;display:grid;place-items:center;min-width:0;min-height:0}
+.light{background:#e9e9e9}.dark{background:#d0d0d0}.check{background:#cbdcc7!important}.goal-cell{background:rgba(255,220,90,.48)!important}
+.piece{width:76%;aspect-ratio:1;border-radius:50%;display:block;z-index:2;box-shadow:none}
+.a{background:#4b63d9}.b{background:#b45446}
+.selected{outline:5px solid #27334c;outline-offset:-5px}
+.target:after{content:"";width:22%;aspect-ratio:1;border-radius:50%;background:#299d56;position:absolute;z-index:3}
+.bolt{position:absolute;width:34%;height:40%;pointer-events:none}
+.bolt path{fill:none;stroke:#63866c;stroke-width:1.8}
+.cell:has(.piece) .bolt,.cell.target .bolt{display:none}
+.historypanel h2,.operation h2{font-size:25px;margin:0 0 20px}
+.history{text-align:left;font-size:20px;color:#718096;min-height:26px}
+.operation .buttons{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.operation button{border:2px solid #e3e3e3;border-radius:999px;background:#fff;padding:17px 10px;font-size:20px;font-weight:700;color:#20283a}
+.operation button:disabled{color:#aab0ba;opacity:1}
+.operation .hint{font-size:18px;color:#888;margin:18px 0}
+.operation .resetbtn{width:100%;border:2px solid #d1d1d1;font-size:20px;padding:17px}
+details summary{cursor:pointer;font-weight:750;font-size:23px}
+details li,details p{font-size:17px;line-height:1.8;color:#555}
+.small{font-size:14px;color:#888;text-align:center}
+@media(max-width:560px){
+ main{padding:18px 16px 34px}
+ h1{font-size:27px;margin:6px 0 28px}
+ .panel{padding:20px;border-radius:26px;margin:16px 0}
+ .settings h2,.boardhead h2,.historypanel h2,.operation h2{font-size:22px}
+ .settingrow label{font-size:17px}
+ .choice button{min-width:0;padding:13px 15px;font-size:16px}
+ .pill{font-size:18px;padding:15px 8px}
+ .scorecard{padding:18px 8px;border-radius:25px}
+ .scorecard h3{font-size:21px}.scorecard .count{font-size:29px}.scorecard .resource{font-size:20px}
+ .boardhead{margin:18px 4px 14px}.turnbadge{font-size:16px;padding:12px 15px}
+ .status{font-size:16px;padding:16px 10px}
+ .board-wrap{padding:18px;border-radius:46px;border-width:3px}
+ .board{gap:8px}.cell{border-radius:23%}
+ .history{font-size:18px}
+ .operation button{font-size:17px;padding:15px 8px}
+ .operation .hint{font-size:16px}
+ details li,details p{font-size:15px}
+}
+@media(max-width:380px){.choice button{padding:11px 10px}.board{gap:5px}.board-wrap{padding:13px}}
+</style></head><body>
+<main>
+<h1>ボードゲーム(Gemini)</h1>
+<div class="modebar">
+<button id="modeAI" class="pill active">AIと対戦</button>
+<button id="modeLocal" class="pill">2人対戦</button>
+</div>
+<section class="panel settings">
+<h2>対戦設定</h2>
+<div id="sideBox" class="settingrow">
+<label>自分が操作する側</label>
+<div class="choice"><button id="humanA" class="active">A（青）</button><button id="humanB">B（赤）</button></div>
+</div>
+<div class="settingrow">
+<label>先手</label>
+<div class="choice"><button id="firstA" class="active">A（青）</button><button id="firstB">B（赤）</button></div>
+</div>
+<button class="primary" id="reset">ゲーム開始</button>
+<select id="mode" class="hidden-native"><option value="ai">AI</option><option value="local">2人</option></select>
+<select id="human" class="hidden-native"><option value="1">A</option><option value="-1">B</option></select>
+<select id="first" class="hidden-native"><option value="random">ランダム</option><option value="1">A</option><option value="-1">B</option></select>
+</section>
+<div class="scoregrid">
+<div class="scorecard"><h3 class="blue">A（青）</h3><div class="count blue"><span id="goalA">0</span> / 4</div><div class="sub">ゴール到達数</div><div class="resource blue">ブースト <span id="boostA">0</span></div><div class="resource blue">パス残り <span id="passA">3</span></div></div>
+<div class="scorecard"><h3 class="red">B（赤）</h3><div class="count red"><span id="goalB">0</span> / 4</div><div class="sub">ゴール到達数</div><div class="resource red">ブースト <span id="boostB">0</span></div><div class="resource red">パス残り <span id="passB">3</span></div></div>
+</div>
+<div class="boardhead"><h2>対局盤面</h2><div class="turnbadge" id="turnBadge">A（青）の手番</div></div>
+<div class="status" id="status">対戦設定を選択してゲームを開始してください。</div>
+<div class="board-wrap"><div class="board" id="board"></div></div>
+<section class="panel historypanel"><h2>直前の駒の移動</h2><div class="history" id="history">まだ移動履歴はありません。</div></section>
+<section class="panel operation"><h2>操作</h2>
+<div class="buttons"><button id="boostMain" disabled>ブーストを使用</button><button id="passBtn">パス</button></div>
+<div class="hint">駒を選択すると移動先が緑色で表示されます。</div>
+<button class="resetbtn" id="resetVisible">リセット</button>
+<button id="useA" class="hidden-native" disabled>ブーストA</button><button id="useB" class="hidden-native" disabled>ブーストB</button><button id="cancelBoost" class="hidden-native" disabled>取消</button>
+</section>
+<section class="panel"><details><summary>ゲームルール</summary><ul>
+<li>盤面は6×6です。A（青）は6行目、B（赤）は1行目に駒を6個ずつ配置します。</li>
+<li>駒は相手側に向かって進みます。通常移動では、前方・斜め前・後方・斜め後方へ1マス移動できます。ゴール行に到達した駒は固定され、その後は移動できません。</li>
+<li>前方または斜め前に相手の駒があり、その先のマスが空いている場合は、相手の駒を飛び越えて2マス先へ進めます。飛び越えられた駒は盤面に残ります。</li>
+<li>相手の駒の左右隣に自分の駒がある場合、その相手の駒には「側面ブロック」がかかります。相手の駒から見て右側に自分の駒がある場合は右斜め前への移動・ジャンプが禁止され、左側にある場合は左斜め前への移動・ジャンプが禁止されます。左右両側に自分の駒がある場合でも、前方への直進は可能です。隣接状態が解消されると、側面ブロックも解除されます。</li>
+<li>中央の緑色の4マスは「ブーストマス」です。通常移動でブーストマスに止まる、またはジャンプの途中でブーストマスを通過すると、ブーストを1回獲得します。1手番で獲得できるのは最大1回で、所持できるブーストは最大2回です。所持数が2回のときは追加獲得できません。</li>
+<li>ブーストを使うと、通常の手番の代わりに、合計2回の移動を行えます。移動方法は「同じ駒を2回動かして合計2マス進める」か、「異なる2個の駒を1回ずつ動かして、それぞれ1マス進める」のどちらかです。</li>
+<li>ブーストを開始すると、まず1回目に動かす駒を選びます。駒を選ぶと、その駒が移動できるマスが緑色で表示されます。移動先を選んで1回目の移動を確定した後、2回目に動かす駒と移動先を選びます。2回目は1回目の移動後の盤面を基準に判定されるため、1回目に動かした駒をもう一度選ぶことも、別の駒を選ぶこともできます。</li>
+<li>ブースト中の各移動でも、通常移動と同じ移動方向・ジャンプ・側面ブロックのルールが適用されます。ただし、ブースト中はゴール行に入る移動はできません。また、ブースト中の移動では新しいブーストを獲得しません。</li>
+<li>1回目の移動後に合法な2回目の移動が1つもない場合は、1回目だけを実行して手番を終了します。2回目の移動が可能な場合は、2回目の移動を行ってから相手の手番になります。ブーストは使用を開始した時点で1回分消費します。</li>
+<li>各プレイヤーは任意に最大3回までパスできます。移動できない場合は、パス権が残っていれば自動的にパスします。パス権も残っていない場合は強制スキップとなります。</li>
+<li>先に4個の駒を相手側の最奥行（ゴール行）へ到達させたプレイヤーが勝利します。</li>
+<li>同じ盤面・手番・パス残数・ブースト数の局面が3回発生した場合、または双方が移動できずパス権も残っていない場合は引き分けです。</li>
+</ul><p>AIは最大5プライを目標に探索します。思考時間は端末や局面によって変わります。</p></details></section>
+<p class="small">現段階の試作版</p>
+</main>
+<script>
+
+const $=x=>document.getElementById(x),CHECK=new Set([14,15,20,21]);let s,sel=null,targets=[],boostStage=0,boostFirst=null,boostTemp=null,busy=false,seen=new Map(),last='直前の移動：—',timer;
+function rc(i){return [i/6|0,i%6]}function ix(r,c){return r*6+c}function inside(r,c){return r>=0&&r<6&&c>=0&&c<6}
+function fixed(i,p){return p===1?rc(i)[0]===0:rc(i)[0]===5}
+function init(){let b=Array(36).fill(0);for(let c=0;c<6;c++){b[30+c]=1;b[c]=-1}return{b,turn:Math.random()<.5?1:-1,boost:{1:0,'-1':0},pass:{1:3,'-1':3},ply:0,winner:0,draw:false}}
+function block(st,i,p,dc){let [r,c]=rc(i),cc=c+dc;return inside(r,cc)&&st.b[ix(r,cc)]===-p}
+function steps(st,p,noGoal=false){let out=[];for(let i=0;i<36;i++)if(st.b[i]===p&&!fixed(i,p)){let [r,c]=rc(i);for(let dr of [-1,1])for(let dc of [-1,0,1]){let rr=r+dr,cc=c+dc;if(!inside(rr,cc))continue;if(dr===-p&&dc!==0&&block(st,i,p,dc))continue;let j=ix(rr,cc);if(st.b[j]===0){if(!noGoal||!fixed(j,p))out.push({from:i,to:j,via:-1,kind:'move'})}else if(st.b[j]===-p&&dr===-p){let r2=r+2*dr,c2=c+2*dc;if(inside(r2,c2)&&st.b[ix(r2,c2)]===0&&(!noGoal||!fixed(ix(r2,c2),p)))out.push({from:i,to:ix(r2,c2),via:j,kind:'jump'})}}}return out}
+function clone(st){return{...st,b:st.b.slice(),boost:{...st.boost},pass:{...st.pass}}}
+function apply(st,a,p,checkpoint){let n=clone(st);n.b[a.from]=0;n.b[a.to]=p;if(checkpoint&&(CHECK.has(a.to)||(a.via>=0&&CHECK.has(a.via))))n.boost[p]=Math.min(2,n.boost[p]+1);return n}
+function wins(st,p){return st.b.filter((v,i)=>v===p&&fixed(i,p)).length}
+function checkWin(st){if(wins(st,1)>=4)st.winner=1;else if(wins(st,-1)>=4)st.winner=-1}
+function key(st){return st.b.join('')+'|'+st.turn+'|'+st.pass[1]+','+st.pass[-1]+'|'+st.boost[1]+','+st.boost[-1]}
+function mark(){let k=key(s);seen.set(k,(seen.get(k)||0)+1);if(seen.get(k)>=3)s.draw=true}
+function humanTurn(){return $('mode').value==='local'||s.turn===+$('human').value}
+function draw(){let board=$('board');board.innerHTML='';for(let i=0;i<36;i++){let el=document.createElement('button');let isTarget=targets.some(a=>a.to===i),isGoal=!!s.b[i]&&fixed(i,s.b[i]);el.className='cell '+((rc(i)[0]+rc(i)[1])%2?'dark':'light')+(CHECK.has(i)?' check':'')+(isGoal?' goal-cell':'')+(sel===i?' selected':'')+(isTarget?' target':'');el.setAttribute('aria-label',`${rc(i)[0]+1}行${rc(i)[1]+1}列`);if(CHECK.has(i)&&!isTarget){el.innerHTML='<svg class="bolt" viewBox="0 0 24 28"><path d="M14 1 4 15h7l-1 12 10-16h-7z"/></svg>'}if(s.b[i]){let p=document.createElement('span');p.className='piece '+(s.b[i]===1?'a':'b');el.append(p)}el.onclick=()=>clickCell(i);board.append(el)}
+$('boostA').textContent=s.boost[1];$('boostB').textContent=s.boost[-1];$('passA').textContent=s.pass[1];$('passB').textContent=s.pass[-1];$('turn').textContent=s.turn===1?'A（青）':'B（赤）';$('turnBadge').textContent=s.turn===1?'A（青）の手番':'B（赤）の手番';$('goalA').textContent=wins(s,1);$('goalB').textContent=wins(s,-1);$('ply').textContent=s.ply;$('history').textContent=last;
+$('status').textContent=s.winner?(s.winner===1?'A（青）の勝利！':'B（赤）の勝利！'):s.draw?'引き分け':busy?'AIが思考中…':`${s.turn===1?'A（青）':'B（赤）'}の手番です`;
+$('useA').disabled=!(s.turn===1&&s.boost[1]>0&&humanTurn()&&!s.winner&&!s.draw);$('useB').disabled=!(s.turn===-1&&s.boost[-1]>0&&humanTurn()&&!s.winner&&!s.draw);$('boostMain').disabled=(s.boost[s.turn]<=0||!humanTurn()||!!s.winner||s.draw);$('boostMain').textContent='ブーストを使用';$('passBtn').disabled=!humanTurn()||s.pass[s.turn]<=0||!!s.winner||s.draw;$('cancelBoost').disabled=!boostStage}
+function autoForced(){if(s.winner||s.draw)return;let m=steps(s,s.turn);if(!m.length){if(s.pass[s.turn]>0){s.pass[s.turn]--;s.ply++;last=(s.turn===1?'A':'B')+'：移動不可のため自動パス';s.turn=-s.turn;mark();autoForced()}else if(!steps(s,-s.turn).length&&s.pass[-s.turn]===0)s.draw=true;else{s.ply++;last=(s.turn===1?'A':'B')+'：強制スキップ';s.turn=-s.turn;mark();autoForced()}}}
+function finish(n,desc){s=n;s.ply++;last=desc;checkWin(s);if(!s.winner){s.turn=-s.turn;mark();autoForced()}sel=null;targets=[];boostStage=0;boostFirst=null;draw();maybeAI()}
+function clickCell(i){if(busy||s.winner||s.draw||!humanTurn())return;if(boostStage===3){boostSecondTarget(i);return}if(boostStage===2){let a=targets.find(x=>x.to===i);if(a){boostSecondTarget(i);return}if(s.b[i]===s.turn){boostStage=1;boostFirst=i;chooseBoostFirst(i)}return}if(boostStage===1){chooseBoostFirst(i);return}if(sel!==null){let a=targets.find(x=>x.to===i);if(a){let n=apply(s,a,s.turn,true),[r,c]=rc(a.from),[rr,cc]=rc(a.to);finish(n,`${s.turn===1?'A':'B'}：${r+1}行${c+1}列 → ${rr+1}行${cc+1}列${a.kind==='jump'?'（ジャンプ）':''}`);return}}if(s.b[i]===s.turn&&!fixed(i,s.turn)){sel=i;targets=steps(s,s.turn).filter(a=>a.from===i)}else{sel=null;targets=[]}draw()}
+function chooseBoostFirst(i){if(s.b[i]!==s.turn||fixed(i,s.turn))return;let a=steps(s,s.turn,true).filter(x=>x.from===i);if(!a.length)return;boostFirst=i;sel=i;targets=a;boostStage=2;draw();$('status').textContent='ブースト：1歩目の移動先を選択'}
+function boostSecondTarget(i){let a=targets.find(x=>x.to===i);if(boostStage===2&&a){let temp=apply(s,a,s.turn,false),sec=steps(temp,s.turn,true);boostTemp={temp,first:a,side:s.turn};boostStage=3;sel=null;targets=sec;draw();$('status').textContent=sec.length?'ブースト：2歩目の駒と移動先を選択':'2歩目がないため1歩目だけ実行';if(!sec.length)completeBoost(null);return}if(boostStage===3){let b=targets.find(x=>x.to===i);if(b)completeBoost(b)}}
+function completeBoost(b){let {temp,first,side}=boostTemp;if(b)temp=apply(temp,b,side,false);temp.boost[side]=Math.max(0,temp.boost[side]-1);let [r,c]=rc(first.from),[rr,cc]=rc(first.to),desc=`${side===1?'A':'B'}：ブースト ${r+1}行${c+1}列 → ${rr+1}行${cc+1}列`;if(b){let [x,y]=rc(b.from),[xx,yy]=rc(b.to);desc+=` ／ ${x+1}行${y+1}列 → ${xx+1}行${yy+1}列`}finish(temp,desc);boostTemp=null}
+function startBoost(p){if(s.turn!==p||!humanTurn()||s.boost[p]<=0)return;boostStage=1;sel=null;targets=[];draw();$('status').textContent='ブースト：1歩目に動かす駒を選択'}
+$('useA').onclick=()=>startBoost(1);$('useB').onclick=()=>startBoost(-1);$('cancelBoost').onclick=()=>{boostStage=0;sel=null;targets=[];boostTemp=null;draw()};
+$('passBtn').onclick=()=>{if(!humanTurn()||s.pass[s.turn]<=0)return;let p=s.turn,n=clone(s);n.pass[p]--;finish(n,(p===1?'A':'B')+'：任意パス')};
+function acts(st,p){let a=steps(st,p).map(x=>({type:'move',a:x}));if(st.pass[p]>0)a.push({type:'pass'});if(st.boost[p]>0)for(let x of steps(st,p,true)){let t=apply(st,x,p,false),sec=steps(t,p,true);if(!sec.length)a.push({type:'boost',a:x,b:null});else for(let y of sec)a.push({type:'boost',a:x,b:y})}return a}
+function doAct(st,x,p){let n=clone(st);if(x.type==='pass'){n.pass[p]--;n.turn=-p;return n}n=apply(n,x.a,p,x.type==='move');if(x.type==='boost'){if(x.b)n=apply(n,x.b,p,false);n.boost[p]=Math.max(0,n.boost[p]-1)}n.turn=-p;checkWin(n);return n}
+function evalState(st){if(wins(st,1)>=4)return 1e6;if(wins(st,-1)>=4)return-1e6;let v=(wins(st,1)-wins(st,-1))*10000;for(let i=0;i<36;i++){if(st.b[i]===1)v+=(5-rc(i)[0])*10;if(st.b[i]===-1)v-=(rc(i)[0])*10}for(let c=0;c<6;c++){if(st.b[6+c]===1)v+=50;if(st.b[24+c]===-1)v-=50}v+=(st.boost[1]-st.boost[-1])*30+(st.pass[1]-st.pass[-1])*5;v+=(steps(st,1).length-steps(st,-1).length)*2;return v}
+let table=new Map(),deadline=0,timeout=false;
+function search(st,d,alpha,beta){if(performance.now()>deadline){timeout=true;return evalState(st)}if(d===0||wins(st,1)>=4||wins(st,-1)>=4)return evalState(st);let k=key(st)+'#'+d;if(table.has(k))return table.get(k);let list=acts(st,st.turn);if(!list.length)return evalState(st);list.sort((x,y)=>priority(st,y,st.turn)-priority(st,x,st.turn));let best=st.turn===1?-Infinity:Infinity;for(let a of list){let n=doAct(st,a,st.turn),v=search(n,d-1,alpha,beta);if(st.turn===1){best=Math.max(best,v);alpha=Math.max(alpha,best)}else{best=Math.min(best,v);beta=Math.min(beta,best)}if(beta<=alpha||timeout)break}if(!timeout)table.set(k,best);return best}
+function priority(st,x,p){if(x.type==='pass')return-100;let z=x.type==='boost'?2:1;for(let a of [x.a,x.b].filter(Boolean)){if(fixed(a.to,p))z+=10000;if(a.kind==='jump')z+=3}return z}
+function maybeAI(){if($('mode').value!=='ai'||humanTurn()||s.winner||s.draw||busy)return;clearTimeout(timer);timer=setTimeout(aiMove,120)}
+function aiMove(){if(humanTurn()||s.winner||s.draw)return;busy=true;draw();let root=clone(s),p=s.turn;setTimeout(()=>{deadline=performance.now()+1800;table.clear();let list=acts(root,p);list.sort((a,b)=>priority(root,b,p)-priority(root,a,p));let chosen=list[0];for(let d=1;d<=5;d++){let local=chosen,best=p===1?-Infinity:Infinity;timeout=false;for(let a of list){let v=search(doAct(root,a,p),d-1,-Infinity,Infinity);if((p===1&&v>best)||(p===-1&&v<best)){best=v;local=a}if(timeout||performance.now()>deadline){timeout=true;break}}if(!timeout)chosen=local;else break}let n=doAct(root,chosen,p),desc;if(chosen.type==='pass')desc=(p===1?'A':'B')+'：パス';else{let [r,c]=rc(chosen.a.from),[rr,cc]=rc(chosen.a.to);desc=`${p===1?'A':'B'}：${r+1}行${c+1}列 → ${rr+1}行${cc+1}列${chosen.type==='boost'?'（ブースト）':''}`}busy=false;s=n;s.ply++;last=desc;checkWin(s);if(!s.winner){mark();autoForced()}draw();maybeAI()},30)}
+function reset(){clearTimeout(timer);s=init();if($('first').value!=='random')s.turn=+$('first').value;sel=null;targets=[];boostStage=0;boostTemp=null;busy=false;seen=new Map();last='直前の移動：—';mark();autoForced();draw();maybeAI()}
+$('mode').onchange=()=>{$('sideBox').style.display=$('mode').value==='local'?'none':'flex';$('modeAI').classList.toggle('active',$('mode').value==='ai');$('modeLocal').classList.toggle('active',$('mode').value==='local');reset()};$('human').onchange=reset;$('first').onchange=reset;$('reset').onclick=reset;$('resetVisible').onclick=reset;
+$('sideBox').style.display='flex';
+$('modeAI').onclick=()=>{$('mode').value='ai';$('mode').onchange()};
+$('modeLocal').onclick=()=>{$('mode').value='local';$('mode').onchange()};
+$('humanA').onclick=()=>{$('human').value='1';$('human').onchange();$('humanA').classList.add('active');$('humanB').classList.remove('active')};
+$('humanB').onclick=()=>{$('human').value='-1';$('human').onchange();$('humanB').classList.add('active');$('humanA').classList.remove('active')};
+$('firstA').onclick=()=>{$('first').value='1';$('first').onchange();$('firstA').classList.add('active');$('firstB').classList.remove('active')};
+$('firstB').onclick=()=>{$('first').value='-1';$('first').onchange();$('firstB').classList.add('active');$('firstA').classList.remove('active')};
+$('boostMain').onclick=()=>{if(s.turn===1)$('useA').click();else $('useB').click()};
+$('reset').onclick=reset;$('resetVisible').onclick=reset;
+reset();
+$('status').textContent='対戦設定を選択してゲームを開始してください。';
+</script></body></html>
