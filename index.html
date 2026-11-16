@@ -113,7 +113,7 @@ details li,details p{font-size:17px;line-height:1.8;color:#555}
 <li>ブーストでは、1回目の移動後に2回目の駒と行き先を選びます。2回目は移動後の盤面で判定し、1回目と同じ駒も選べます。各移動には通常と同じ移動・ジャンプ・側面ブロックのルールが適用されます。</li>
 <li>ブースト中はゴール行への移動とブースト獲得はできません。2回目に動ける手がなければ、1回目だけで手番終了です。ブーストは使用開始時に1回分消費します。</li>
 <li>各プレイヤーは最大3回まで任意にパスできます。移動できない場合は、パス権があれば自動パスし、なければ強制スキップします。</li>
-<li>先に4個の駒を相手側の最奥行（ゴール行）へ到達させると勝利です。同じ盤面・手番・パス残数・ブースト数が3回発生した場合、または双方とも移動できずパス権もない場合は引き分けです。</li>
+<li>先に4個の駒を相手側の最奥行（ゴール行）へ到達させると勝利です。同じ盤面・手番・パス残数・ブースト数が10回発生した場合、または双方とも移動できずパス権もない場合は引き分けです。</li>
 </ul></details></section>
 <p class="small">現段階の試作版</p>
 </main>
@@ -130,7 +130,7 @@ function apply(st,a,p,checkpoint){let n=clone(st);n.b[a.from]=0;n.b[a.to]=p;if(c
 function wins(st,p){return st.b.filter((v,i)=>v===p&&fixed(i,p)).length}
 function checkWin(st){if(wins(st,1)>=4)st.winner=1;else if(wins(st,-1)>=4)st.winner=-1}
 function key(st){return st.b.join('')+'|'+st.turn+'|'+st.pass[1]+','+st.pass[-1]+'|'+st.boost[1]+','+st.boost[-1]}
-function mark(){let k=key(s);seen.set(k,(seen.get(k)||0)+1);if(seen.get(k)>=3)s.draw=true}
+function mark(){let k=key(s);seen.set(k,(seen.get(k)||0)+1);if(seen.get(k)>=10)s.draw=true}
 function humanTurn(){return $('mode').value==='local'||s.turn===+$('human').value}
 function draw(){let view=(boostStage===3&&boostTemp)?boostTemp.temp:s;let board=$('board');board.innerHTML='';for(let i=0;i<36;i++){let el=document.createElement('button');let isTarget=targets.some(a=>a.to===i),isGoal=!!view.b[i]&&fixed(i,view.b[i]);el.className='cell '+((rc(i)[0]+rc(i)[1])%2?'dark':'light')+(CHECK.has(i)?' check':'')+(isGoal?' goal-cell':'')+(sel===i?' selected':'')+(isTarget?' target':'');el.setAttribute('aria-label',`${rc(i)[0]+1}行${rc(i)[1]+1}列`);if(CHECK.has(i)&&!isTarget){el.innerHTML='<svg class="bolt" viewBox="0 0 24 28"><path d="M14 1 4 15h7l-1 12 10-16h-7z"/></svg>'}if(view.b[i]){let p=document.createElement('span');p.className='piece '+(view.b[i]===1?'a':'b');el.append(p)}el.onclick=()=>clickCell(i);board.append(el)}
 $('boostA').textContent=s.boost[1];$('boostB').textContent=s.boost[-1];$('passA').textContent=s.pass[1];$('passB').textContent=s.pass[-1];$('turnBadge').textContent=s.turn===1?'A（青）の手番':'B（赤）の手番';$('goalA').textContent=wins(s,1);$('goalB').textContent=wins(s,-1);$('history').textContent=last;
