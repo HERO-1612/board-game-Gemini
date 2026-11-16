@@ -28,7 +28,7 @@ h1{text-align:center;font-size:clamp(25px,4vw,38px);font-weight:800;letter-spaci
 .turnbadge{background:#f0f2f8;border-radius:999px;padding:14px 20px;font-size:19px}
 .status{background:#f2f2f3;border-radius:18px;text-align:center;padding:18px 12px;font-size:19px;color:#30394b;margin-bottom:22px;min-height:60px}
 .board-wrap{width:100%;max-width:770px;margin:0 auto 24px;background:#fff;border:4px solid #e1e1e1;border-radius:58px;padding:26px}
-.board{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;aspect-ratio:1}
+.board{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:14px;aspect-ratio:1;width:100%}
 .cell{position:relative;border:0;border-radius:24%;padding:0;display:grid;place-items:center;min-width:0;min-height:0}
 .light{background:#e9e9e9}.dark{background:#d0d0d0}.check{background:#cbdcc7!important}.goal-cell{background:rgba(255,220,90,.48)!important}
 .piece{width:76%;aspect-ratio:1;border-radius:50%;display:block;z-index:2;box-shadow:none}
